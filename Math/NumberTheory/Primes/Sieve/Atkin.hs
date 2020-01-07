@@ -8,25 +8,33 @@
 --
 
 {-# LANGUAGE BangPatterns #-}
+{-# LANGUAGE MagicHash    #-}
 
 module Math.NumberTheory.Primes.Sieve.Atkin
   ( atkinPrimeList
   , atkinSieve
+  , atkinFromTo
   ) where
 
 import Control.Monad
 import Control.Monad.ST
 import Data.Bit
 import Data.Bits
+import Data.Coerce
 import Data.Maybe
 import qualified Data.Vector as V
 import qualified Data.Vector.Unboxed as U
 import qualified Data.Vector.Unboxed.Mutable as MU
 import Data.Word
+import GHC.Exts
 
-import Math.NumberTheory.Roots.Squares
 import Math.NumberTheory.Primes.Small
+import Math.NumberTheory.Primes.Types
+import Math.NumberTheory.Roots
 import Math.NumberTheory.Utils
+
+atkinFromTo :: Int -> Int -> [Prime Int]
+atkinFromTo low high = coerce $ atkinPrimeList $ atkinSieve low (high - low + 1)
 
 atkinPrimeList :: PrimeSieve -> [Int]
 atkinPrimeList (PrimeSieve low len segments)
@@ -242,9 +250,12 @@ algo3steps456 low60 len60 vec =
   where
     low  = 7
     high = integerSquareRoot (60 * (low60 + len60) - 1)
+    !(Ptr smallPrimesAddr#) = smallPrimesPtr
     ps
       | high <= fromIntegral (maxBound :: Word16)
-      = takeWhile (<= high) $ dropWhile (< low) $ map fromIntegral $ U.toList smallPrimes
+      = takeWhile (<= high) $ dropWhile (< low)
+      $ map (\(I# k#) -> I# (word2Int# (indexWord16OffAddr# smallPrimesAddr# k#)))
+      $ [1 .. smallPrimesLength - 1]
       | otherwise
       = atkinPrimeList $ atkinSieve low (high - low + 1)
 
