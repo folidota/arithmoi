@@ -22,10 +22,10 @@ import Data.Maybe
 import qualified Data.Vector as V
 import qualified Data.Vector.Unboxed as U
 import qualified Data.Vector.Unboxed.Mutable as MU
+import Data.Word
 
 import Math.NumberTheory.Roots.Squares
-import qualified Math.NumberTheory.Primes.Sieve.Eratosthenes as E
-import Math.NumberTheory.Primes.Types
+import Math.NumberTheory.Primes.Small
 import Math.NumberTheory.Utils
 
 atkinPrimeList :: PrimeSieve -> [Int]
@@ -242,7 +242,11 @@ algo3steps456 low60 len60 vec =
   where
     low  = 7
     high = integerSquareRoot (60 * (low60 + len60) - 1)
-    ps   = takeWhile (<= high) $ dropWhile (< low) $ map unPrime E.primes
+    ps
+      | high <= fromIntegral (maxBound :: Word16)
+      = takeWhile (<= high) $ dropWhile (< low) $ map fromIntegral $ U.toList smallPrimes
+      | otherwise
+      = atkinPrimeList $ atkinSieve low (high - low + 1)
 
 -- | Cross out multiples of the first argument
 -- in a given sieve.
