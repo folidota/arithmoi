@@ -4,7 +4,7 @@
 -- Licence:     MIT
 -- Maintainer:  Federico Bongiorno <federicobongiorno97@gmail.com>
 --
--- <http://www.enseignement.polytechnique.fr/profs/informatique/Francois.Morain/Master1/Crypto/projects/Wiedemann86.pdf Weidemann algorithm>
+-- <http://www.enseignement.polytechnique.fr/profs/informatique/Francois.Morain/Master1/Crypto/projects/Wiedemann86.pdf Wiedemann algorithm>
 -- to find a non-zero element in the kernel of a singular sparse binary matrix.
 
 {-# LANGUAGE CPP                 #-}
